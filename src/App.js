@@ -348,11 +348,18 @@ export default function App() {
         db.get("notes",       "order=created_at.desc"),
         db.get("files",       "order=created_at.desc"),
       ]);
-      const withBB = (inv || []).map(i =>
-        i.type === "public" && i.ticker
-          ? { ...i, bloombergData: { price: Number(i.price_per_unit)||0, change:0, pct:0, mktCap:"—", pe:null, vol:"—" } }
-          : { ...i, bloombergData: null }
-      );
+      const withBB = (inv || []).map(i => ({
+        ...i,
+        committed:      Number(i.committed)      || 0,
+        nav:            Number(i.nav)            || 0,
+        irr:            Number(i.irr)            || 0,
+        moic:           Number(i.moic)           || 1,
+        units:          i.units          != null ? Number(i.units)          : null,
+        price_per_unit: i.price_per_unit != null ? Number(i.price_per_unit) : null,
+        bloombergData:  i.type === "public" && i.ticker
+          ? { price: Number(i.price_per_unit)||0, change:0, pct:0, mktCap:"—", pe:null, vol:"—" }
+          : null,
+      }));
       setInvestments(withBB);
       setNotes(nt || []);
       setFiles(fl || []);
